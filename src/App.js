@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import SudokuEngine from './lib/sudoku';
-import { BASE, DIMENSION } from './lib/consts'
+import { DIMENSION } from './lib/consts'
 
 import './App.css';
 
@@ -30,7 +30,6 @@ class App extends Component {
     this.setState({
       grid,
     });
-    this.isSolved();
   }
 
   searchNakedSingles() {
@@ -40,7 +39,6 @@ class App extends Component {
     this.setState({
       grid,
     });
-    this.isSolved();
   }
 
   searchHiddenSubsets() {
@@ -50,7 +48,6 @@ class App extends Component {
     this.setState({
       grid,
     });
-    this.isSolved();
   }
 
   searchNakedSubsets() {
@@ -60,7 +57,6 @@ class App extends Component {
     this.setState({
       grid,
     });
-    this.isSolved();
   }
 
   searchXWing() {
@@ -70,7 +66,6 @@ class App extends Component {
     this.setState({
       grid,
     });
-    this.isSolved();
   }
 
   searchPointingSubsets() {
@@ -80,7 +75,6 @@ class App extends Component {
     this.setState({
       grid,
     });
-    this.isSolved();
   }
 
   searchBoxLineReduction() {
@@ -90,7 +84,6 @@ class App extends Component {
     this.setState({
       grid,
     });
-    this.isSolved();
   }
 
   classHelper(isGiven, isSolved, hasCandidates) {
@@ -101,7 +94,7 @@ class App extends Component {
   }
 
   render() {
-    const { grid, init, solved } = this.state;
+    const { grid } = this.state;
     return (
       <div className="sudoku">
         <div className="sudoku_box">
