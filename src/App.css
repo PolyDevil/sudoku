@@ -1,0 +1,116 @@
+.sudoku {
+	display: flex;
+	flex-flow: row wrap;
+	align-items: center;
+	justify-content: center;}
+
+.sudoku_box {
+	max-width: 400px;
+	width: 100%;
+	position: relative;
+}
+.sudoku_box:before {
+	content: "";
+	display: block;
+	width: 100%;
+	padding-top: 100%;
+}
+.sudoku__grid {
+	display: grid;
+	grid-template-columns: repeat(9, 1fr);
+	grid-template-rows: repeat(9, 1fr);
+	grid-gap: 1px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.sudoku__cell {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #fff;
+	position: relative;
+}
+.sudoku__cell var {
+	position: absolute;
+	right: 0;
+	top: 0;
+	color: #1d1d1d;
+	font-size: 0.7rem;
+}
+.sudoku__cell:nth-of-type(9n + 3) {
+	margin-right: 2px;
+}
+.sudoku__cell:nth-of-type(9n + 7) {
+	margin-left: 2px;
+}
+.sudoku__cell:nth-of-type(n + 55):nth-of-type(-n + 63) {
+	margin-top: 2px;
+}
+.sudoku__cell:nth-of-type(n + 19):nth-of-type(-n + 27) {
+	margin-bottom: 2px;
+}
+
+
+.sudoku__cell____isSolved {
+	background-color: rgb(122, 199, 79);
+	font-weight: bold;
+	font-size: larger;
+}
+.sudoku__cell____isGiven {
+	background-color: rgb(232, 116, 97);
+	font-weight: bold;
+	font-size: larger;
+}
+.sudoku__cell____unSolved {
+	background-color: rgb(213, 216, 135);
+	font-size: smaller;
+}
+
+.sudoku__nav {
+	max-width: 400px;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+.sudoku__block {
+	padding: .4rem;
+}
+.sudoku__title {
+	margin: 0 0 1rem 0;
+	padding: 0;
+	color: #fff;
+}
+.sudoku__nav_list {
+	display: flex;
+	flex-flow: column nowrap;
+	list-style: none;
+	margin: .4rem 0;
+	padding: 0;
+}
+.sudoku__subtitle {
+	margin: 0 0 .4rem 0;
+	color: #fff;
+}
+.sudoku__nav_listItem {
+	flex: 1;
+}
+.sudoku__button {
+	padding: 0.6rem;
+	border: 1px solid #fff;
+	border-radius: 6px;
+	background: transparent;
+	color: #aaddff;
+	border: solid 1px #aaddff;
+	padding: 10px 15px;
+	transition: 200ms ease-out;
+}
+.sudoku__button[disabled] {
+	border: 1px solid #ce0101;
+}
+.sudoku__button:hover {
+	box-shadow: 0px 0px 15px 0px rgba(150, 200, 255, .7);
+}
