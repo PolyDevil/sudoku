@@ -3,9 +3,8 @@ import { GetBlockId, GetAxis } from '../unit'
 import { AddToSetInMap, AreCellsInOneBlock } from '../utils'
 
 export default class $BoxLineReduction {
-  constructor(grid, solved, unsolved) {
+  constructor(grid, unsolved) {
     this.grid = grid;
-    this.solved = solved;
     this.unsolved = unsolved;
 
     this.name = 'Box/Line Reduction';

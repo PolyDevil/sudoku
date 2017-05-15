@@ -4,10 +4,9 @@ import { GetXAxis, GetYAxis, GetBlockId } from '../unit'
 import { AddToSetInMap, GetCombinations, AreSetsEqual, GetAxisTypesOfCells, GetIntersection } from '../utils'
 
 export default class $XYZWing extends $YWing {
-  constructor(grid, solved, unsolved) {
-    super(grid, solved, unsolved);
+  constructor(grid, unsolved) {
+    super(grid, unsolved);
     this.grid = grid;
-    this.solved = solved;
     this.unsolved = unsolved;
 
     this.name = 'XYZ-Wing';
@@ -31,35 +30,33 @@ export default class $XYZWing extends $YWing {
 
     axis.forEach((value, key, data) => {
       const { size } = value;
-      if (size > 0) {
-        if (size > 1) {
-          const pairs = GetCombinations([...value], 2);
-          pairs.forEach(pair => {
-            const pairCandidates = pair.map(id => grid[id].candidates ? grid[id].candidates : []);
-            if (!AreSetsEqual(pairCandidates[0], pairCandidates[1])) {
-              data.forEach((v, k) => {
-                if (k !== key) {
-                  const { size: s } = v;
-                  if (s > 0) {
-                    const inunits = [...v];
-                    inunits.forEach(inunit => {
-                      const inunitCandidates = grid[inunit].candidates ? grid[inunit].candidates : [];
-                      if (!pairCandidates.some(pairEl => AreSetsEqual(pairEl, inunitCandidates))) {
-                        const union = new Set([
-                          ...inunitCandidates,
-                          ...pairCandidates.reduce((p, c) => p.concat([...c]), [])
-                        ]);
-                        if (union.size === 3) {
-                          this.solve([...pair, inunit]);
-                        }
+      if (size > 1) {
+        const pairs = GetCombinations([...value], 2);
+        pairs.forEach(pair => {
+          const pairCandidates = pair.map(id => grid[id].candidates);
+          if (!AreSetsEqual(pairCandidates[0], pairCandidates[1])) {
+            data.forEach((v, k) => {
+              if (k !== key) {
+                const { size: s } = v;
+                if (s > 0) {
+                  const inunits = [...v];
+                  inunits.forEach(inunit => {
+                    const inunitCandidates = grid[inunit].candidates;
+                    if (!pairCandidates.some(pairEl => AreSetsEqual(pairEl, inunitCandidates))) {
+                      const union = new Set([
+                        ...inunitCandidates,
+                        ...pairCandidates.reduce((p, c) => p.concat([...c]), [])
+                      ]);
+                      if (union.size === 3) {
+                        this.solve([...pair, inunit]);
                       }
-                    });
-                  }
+                    }
+                  });
                 }
-              });
-            }
-          });
-        }
+              }
+            });
+          }
+        });
       }
     });
   }

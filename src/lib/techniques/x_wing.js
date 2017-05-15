@@ -3,9 +3,8 @@ import { GetXAxis, GetYAxis } from '../unit'
 import { AddToSetInMap, AreCellsRectangle } from '../utils'
 
 export default class $XWing {
-  constructor(grid, solved, unsolved) {
+  constructor(grid, unsolved) {
     this.grid = grid;
-    this.solved = solved;
     this.unsolved = unsolved;
 
     this.name = 'X-Wing';

@@ -3,9 +3,8 @@ import { GetAxis, GetXAxis, GetYAxis, GetBlockId } from '../unit'
 import { AddToSetInMap, GetCombinations, AreSetsEqual, AreCellsInOneBlock, AreCellsRightTriangle, GetAxisTypesOfCells, GetIntersection } from '../utils'
 
 export default class $YWing {
-  constructor(grid, solved, unsolved) {
+  constructor(grid, unsolved) {
     this.grid = grid;
-    this.solved = solved;
     this.unsolved = unsolved;
 
     this.name = 'Y-Wing';

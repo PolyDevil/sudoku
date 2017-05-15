@@ -3,8 +3,8 @@ import { TUPLE } from '../consts'
 import { AddToSetInMap, GetSubsetSizes, GetTypeOfCells } from '../utils'
 
 export default class $Naked extends HiddenNaked {
-  constructor(grid, solved, unsolved) {
-    super(grid, solved, unsolved);
+  constructor(grid, unsolved) {
+    super(grid, unsolved);
     this.name = 'Naked';
   }
 

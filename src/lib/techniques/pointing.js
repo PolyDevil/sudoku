@@ -2,9 +2,8 @@ import { BASE, DIMENSION, ARRAY, TUPLET, BLOCK } from '../consts'
 import { AddToSetInMap, GetAxisTypesOfCells } from '../utils'
 
 export default class $Pointing {
-  constructor(grid, solved, unsolved) {
+  constructor(grid, unsolved) {
     this.grid = grid;
-    this.solved = solved;
     this.unsolved = unsolved;
 
     this.name = 'Pointing';

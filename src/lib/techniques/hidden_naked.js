@@ -3,9 +3,8 @@ import { GetIds } from '../unit'
 import { AddToSetInMap, GetCombinations } from '../utils'
 
 export default class $NakedHidden {
-  constructor(grid, solved, unsolved) {
+  constructor(grid, unsolved) {
     this.grid = grid;
-    this.solved = solved;
     this.unsolved = unsolved;
 
     this.rows = new Map();
