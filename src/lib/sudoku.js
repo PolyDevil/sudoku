@@ -7,6 +7,7 @@ import $Pointing from './techniques/pointing'
 import $BoxLineReduction from './techniques/box_line_reduction'
 import $XWing from './techniques/x_wing'
 import $YWing from './techniques/y_wing'
+import $XYZWing from './techniques/xyz_wing'
 
 export default class Sudoku {
   constructor($data = [
@@ -31,24 +32,26 @@ export default class Sudoku {
     this.steps = new Map();
     this.setGrid($data);
 
-    this.$naked = new $Naked(this.grid, this.solved, this.unsolved);
-    this.$hidden = new $Hidden(this.grid, this.solved, this.unsolved);
-    this.$pointing = new $Pointing(this.grid, this.solved, this.unsolved);
-    this.$boxLineReduction = new $BoxLineReduction(this.grid, this.solved, this.unsolved);
-    this.$xWing = new $XWing(this.grid, this.solved, this.unsolved);
-    this.$yWing = new $YWing(this.grid, this.solved, this.unsolved);
+    this.$naked = new $Naked(this.grid, this.unsolved);
+    this.$hidden = new $Hidden(this.grid, this.unsolved);
+    this.$pointing = new $Pointing(this.grid, this.unsolved);
+    this.$boxLineReduction = new $BoxLineReduction(this.grid, this.unsolved);
+    this.$xWing = new $XWing(this.grid, this.unsolved);
+    this.$yWing = new $YWing(this.grid, this.unsolved);
+    this.$xyzWing = new $XYZWing(this.grid, this.unsolved);
 
     this.initCandidates();
     // this.solve();
   }
 
   solve() {
-    this.$naked.scan(4);
+/*    this.$naked.scan(4);
     this.$hidden.scan(4);
     this.$pointing.scan();
     this.$boxLineReduction.scan();
     this.$xWing.scan();
-    this.$yWing.scan();
+    this.$yWing.scan();*/
+    this.$xyzWing.scan();
   }
 
   setGrid($data) {
