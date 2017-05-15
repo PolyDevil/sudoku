@@ -19,10 +19,17 @@ export const GenerateUnit = () => {
 }
 
 export const AreCellsInOneBlock = ($cells) => {
-  const cells = $cells.map(el => GetBlockId(el));
+  const cells = $cells.map(cell => GetBlockId(cell));
   const block = cells[0];
-  return cells.every(el => el === block);
+  return cells.every(cell => cell === block);
 }
+
+export const AreCellsInOneLine = ($cells) => {
+  const cells = $cells.map(cell => GetAxis(cell));
+  const root = cells[0];
+  return cells.every(cell => cell[0] === root[0]) || cells.every(cell => cell[1] === root[1]);
+}
+
 
 export const GetAxisTypesOfCells = ($cells) => {
   const cells = $cells.map(el => GetAxis(el));
@@ -140,18 +147,5 @@ export const GetIntersection = ($setA, $setB) => {
     return new Set([...$setA].filter(el => $setB.has(el)));
   } else {
     return new Set();
-  }
-}
-
-export const GetBlockFromCellsTriplet = ($cells) => {
-  const cells = $cells.map(el => GetBlockId(el));
-  if (cells[0] === cells[1]) {
-    return [$cells[0], $cells[1]];
-  } else if (cells[0] === cells[2]) {
-    return [$cells[0], $cells[2]];
-  } else if(cells[1] === cells[2]) {
-    return [$cells[1], $cells[2]];
-  } else {
-    return false;
   }
 }
