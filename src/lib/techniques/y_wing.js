@@ -1,6 +1,6 @@
 import { BASE, DIMENSION, ARRAY, BLOCK, TUPLET } from '../consts'
 import { GetAxis, GetXAxis, GetYAxis, GetBlockId } from '../unit'
-import { AddToSetInMap, GetCombinations, AreSetsEqual, AreCellsInOneBlock, AreCellsRightTriangle, GetAxisTypesOfCells, GetIntersection } from '../utils'
+import { AddToSetInMap, GetCombinations, AreSetsEqual, AreCellsInOneBlock, AreCellsInOneLine, AreCellsRightTriangle, GetAxisTypesOfCells, GetIntersection } from '../utils'
 
 export default class $YWing {
   constructor(grid, unsolved) {
@@ -82,37 +82,47 @@ export default class $YWing {
   }
 
   getWing($cells) {
-    const lines = this.getLines($cells);
     let _data = false;
     const setData = (data) => {
       _data = data;
     }
-    const inLine = lines[0];
-    if (AreCellsInOneBlock(inLine)) {
-      const inBlock = inLine;
-      const pivot = $cells.filter(cell => inBlock.includes(cell))[0];
-      setData({
-        inLine,
-        inBlock,
-        pivot,
-        pincers: $cells.filter(cell => cell !== pivot)
-      })
-    }
-    for (let l = 1; l < lines.length; l++) {
-      lines[l].forEach(line => {
-        inLine.forEach(cellInLine => {
-          const inBlock = [cellInLine, line];
-          if (AreCellsInOneBlock(inBlock)) {
-            const pivot = inLine.filter(cell => inBlock.includes(cell))[0];
-            setData({
-              inLine,
-              inBlock,
-              pivot,
-              pincers: $cells.filter(cell => cell !== pivot)
-            })
-          }
+    if ($cells.length === 3 && AreCellsRightTriangle($cells) && !AreCellsInOneBlock($cells)) {
+      const inBlock = GetCombinations($cells, 2).reduce((p, pair) => {
+        return AreCellsInOneBlock(pair) ? pair : p;
+      }, false);
+      if (inBlock) {
+        const _inLine = $cells.filter(cell => !inBlock.includes(cell))[0];
+        const inLine = [
+          _inLine,
+          inBlock.filter(cell => AreCellsInOneLine([cell, _inLine]))[0],
+        ];
+        const pivot = inLine.filter(cell => inBlock.includes(cell))[0];
+        setData({
+          inLine,
+          inBlock,
+          pivot,
+          pincers: $cells.filter(cell => cell !== pivot)
+        })
+      }
+    } else {
+      const lines = this.getLines($cells);
+      const inLine = lines[0];
+      for (let l = 1; l < lines.length; l++) {
+        lines[l].forEach(line => {
+          inLine.forEach(cellInLine => {
+            const inBlock = [cellInLine, line];
+            if (AreCellsInOneBlock(inBlock)) {
+              const pivot = inLine.filter(cell => inBlock.includes(cell))[0];
+              setData({
+                inLine,
+                inBlock,
+                pivot,
+                pincers: $cells.filter(cell => cell !== pivot)
+              })
+            }
+          });
         });
-      });
+      }
     }
     return _data;
   }
