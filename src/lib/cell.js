@@ -44,7 +44,7 @@ export default class Cell {
     const { id, cellOnSolved } = this;
     this.value = $value;
     this.isSolved = true;
-    cellOnSolved(id, $value);
+    cellOnSolved(id, $value, $technique);
   }
 
 }

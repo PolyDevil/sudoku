@@ -11,15 +11,15 @@ import $XYZWing from './techniques/xyz_wing'
 
 export default class Sudoku {
   constructor($data = [
-    9, 0, 0, 2, 4, 0, 0, 0, 0,
-    0, 5, 0, 6, 9, 0, 2, 3, 1,
-    0, 2, 0, 0, 5, 0, 0, 9, 0,
-    0, 9, 0, 7, 0, 0, 3, 2, 0,
-    0, 0, 2, 9, 3, 5, 6, 0, 7,
-    0, 7, 0, 0, 0, 2, 9, 0, 0,
-    0, 6, 9, 0, 2, 0, 0, 7, 3,
-    5, 1, 0, 0, 7, 9, 0, 6, 2,
-    2, 0, 7, 0, 8, 6, 0, 0, 9
+    9, 7, 0, 0, 2, 0, 0, 5, 0,
+    0, 0, 0, 6, 0, 7, 0, 0, 9,
+    3, 0, 8, 9, 0, 5, 0, 0, 2,
+    8, 0, 0, 7, 0, 0, 0, 2, 0,
+    0, 0, 9, 0, 6, 0, 3, 0, 0,
+    0, 3, 0, 0, 0, 4, 0, 0, 1,
+    0, 0, 0, 0, 0, 9, 2, 0, 7,
+    4, 8, 2, 3, 7, 6, 0, 0, 5,
+    0, 9, 0, 0, 5, 0, 0, 8, 0
   ]) {
     this.grid = [];
 
@@ -45,12 +45,12 @@ export default class Sudoku {
   }
 
   solve() {
-/*    this.$naked.scan(4);
+    this.$naked.scan(4);
     this.$hidden.scan(4);
     this.$pointing.scan();
     this.$boxLineReduction.scan();
     this.$xWing.scan();
-    this.$yWing.scan();*/
+    this.$yWing.scan();
     this.$xyzWing.scan();
   }
 
@@ -98,7 +98,15 @@ export default class Sudoku {
   }
 
   // Cell onSolve callback - to eliminate solved value from units (row | column | block)
-  cellOnSolved = ($id, $value) => {
+  cellOnSolved = ($id, $value, $technique = '') => {
+    const placeholder = $technique.length > 0 ? 'as ' : '';
+    console.log(
+      `%c Solved:%c ${$id < 10 ? '0' : ''}${$id} =>%c ${$value}%c ${placeholder} ${$technique}`,
+      `color: #7ac74f; font-size: 1rem;`,
+      `color: #d5d887; font-size: 1rem;`,
+      `color: #e87461; font-size: 1rem;`,
+      `color: #4fa0c7; font-size: 1rem;`
+    );
     const { grid, solved, unsolved } = this;
     unsolved.delete($id);
     solved.add($id);
