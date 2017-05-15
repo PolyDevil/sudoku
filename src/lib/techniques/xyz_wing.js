@@ -15,49 +15,52 @@ export default class $XYZWing extends $YWing {
   scan() {
     const { grid, unsolved } = this;
 
-    const [axis] = [new Map()]; // Rows and Columns will provide the same result;
+    const [rows, columns] = [new Map(), new Map()];
     ARRAY.forEach(row => {
       ARRAY.forEach(column => {
         const id = row * DIMENSION + column;
         if (unsolved.has(id)) {
-          const { candidates = new Set() } = grid[id];
+          const { candidates } = grid[id];
           if (candidates.size === 2 || candidates.size === 3) {
-            AddToSetInMap(axis, row, id);
+            AddToSetInMap(rows, row, id);
+            AddToSetInMap(columns, column, id);
           }
         }
       });
     });
 
-    axis.forEach((value, key, data) => {
-      const { size } = value;
-      if (size > 1) {
-        const pairs = GetCombinations([...value], 2);
-        pairs.forEach(pair => {
-          const pairCandidates = pair.map(id => grid[id].candidates);
-          if (!AreSetsEqual(pairCandidates[0], pairCandidates[1])) {
-            data.forEach((v, k) => {
-              if (k !== key) {
-                const { size: s } = v;
-                if (s > 0) {
-                  const inunits = [...v];
-                  inunits.forEach(inunit => {
-                    const inunitCandidates = grid[inunit].candidates;
-                    if (!pairCandidates.some(pairEl => AreSetsEqual(pairEl, inunitCandidates))) {
-                      const union = new Set([
-                        ...inunitCandidates,
-                        ...pairCandidates.reduce((p, c) => p.concat([...c]), [])
-                      ]);
-                      if (union.size === 3) {
-                        this.solve([...pair, inunit]);
+    [rows, columns].forEach(unit => {
+      unit.forEach((value, key, data) => {
+        const { size } = value;
+        if (size > 1) {
+          const pairs = GetCombinations([...value], 2);
+          pairs.forEach(pair => {
+            const pairCandidates = pair.map(id => grid[id].candidates);
+            if (!AreSetsEqual(pairCandidates[0], pairCandidates[1])) {
+              data.forEach((v, k) => {
+                if (k !== key) {
+                  const { size: s } = v;
+                  if (s > 0) {
+                    const inunits = [...v];
+                    inunits.forEach(inunit => {
+                      const inunitCandidates = grid[inunit].candidates;
+                      if (!pairCandidates.some(pairEl => AreSetsEqual(pairEl, inunitCandidates))) {
+                        const union = new Set([
+                          ...inunitCandidates,
+                          ...pairCandidates.reduce((p, c) => p.concat([...c]), [])
+                        ]);
+                        if (union.size === 3) {
+                          this.solve([...pair, inunit]);
+                        }
                       }
-                    }
-                  });
+                    });
+                  }
                 }
-              }
-            });
-          }
-        });
-      }
+              });
+            }
+          });
+        }
+      });
     });
   }
 
@@ -90,7 +93,7 @@ export default class $XYZWing extends $YWing {
             const inLineAxis = GetXAxis(_inLine);
             return {
               cells: [
-                ...TUPLET.map(tuplet => start[inBlockId] + (DIMENSION * (inLineAxis % BASE)) + tuplet)
+                ...TUPLET.map(tuplet => start[inBlockId] + (inLineAxis % BASE) + DIMENSION * tuplet)
               ]
             };
           }
