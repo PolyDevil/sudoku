@@ -4,7 +4,7 @@ import { DIMENSION } from './lib/consts'
 
 import './App.css';
 
-const DEBUG = false;
+const DEBUG = true;
 
 class App extends Component {
   constructor(props) {
@@ -19,6 +19,15 @@ class App extends Component {
     const grid = sudoku.getGrid();
     this.setState({
       sudoku,
+      grid,
+    });
+  }
+
+  searchWXYZWing() {
+    const { sudoku } = this.state;
+    sudoku.$wxyzWing.scan();
+    const grid = sudoku.getGrid();
+    this.setState({
       grid,
     });
   }
@@ -126,6 +135,14 @@ class App extends Component {
             <h2 className="sudoku__title">Solve:</h2>
             <ul className="sudoku__nav_list">
               <h4 className="sudoku__subtitle">Techniques:</h4>
+              <li className="sudoku__nav_listItem">
+                <button
+                  className="sudoku__button"
+                  onClick={() => this.searchWXYZWing()}
+                >
+                  WXYZ-Wing
+                </button>
+              </li>
               <li className="sudoku__nav_listItem">
                 <button
                   className="sudoku__button"
