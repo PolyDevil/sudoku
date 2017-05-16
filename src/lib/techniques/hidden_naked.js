@@ -21,7 +21,7 @@ export default class $NakedHidden {
   scan($maxSubsetSize = DEFAULT_SUBSET_SIZE) {
     this.resetUnitsStore();
 
-    const { unsolved, name, rows, columns, blocks } =  this;
+    const { unsolved, name, rows, columns, blocks } = this;
 
     unsolved.forEach(id => {
       const [row, column, block] = GetIds(id);
