@@ -19,7 +19,10 @@ export default class Cell {
     const eliminatedCandidats = new Set([...candidates].filter(el => !$candidates.has(el)));
     const { size } = eliminatedCandidats;
     if (size > 0) {
-      this.setCandidates($candidates);
+      this.candidates = $candidates;
+    }
+    if (this.candidates.size === 1) {
+      this.solve([...this.candidates][0], $technique || `Naked single`);
     }
   }
 
@@ -34,7 +37,7 @@ export default class Cell {
     if (candidates.has($candidate)) {
       candidates.delete($candidate);
     }
-    if (candidates.size === 1) {
+    if (this.candidates.size === 1) {
       this.solve([...candidates][0], `Naked single`);
     }
   }

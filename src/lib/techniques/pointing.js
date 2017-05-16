@@ -1,4 +1,4 @@
-import { BASE, DIMENSION, ARRAY, TUPLET, BLOCK } from '../consts'
+import { BASE, DIMENSION, ARRAY, TUPLET, BLOCK, TUPLE } from '../consts'
 import { AddToSetInMap, GetAxisTypesOfCells } from '../utils'
 
 export default class $Pointing {
@@ -31,19 +31,25 @@ export default class $Pointing {
 
       values.forEach((value, key) => {
         const { size } = value;
-        if (size < base) {
-          const types = GetAxisTypesOfCells([...value]);
-          types.forEach(el => {
-            const { type, id } = el;
-            this.solve(id, type, [...value], key, `${name}:${type}`);
-          });
+        if (size === 1) {
+          grid[[...value][0]].updateCandidates(new Set([key]), `Hidden single`);
+        } else {
+          if (size < base) {
+            const types = GetAxisTypesOfCells([...value]);
+            types.forEach(el => {
+              const { type, id } = el;
+              const tuplet = TUPLE.get(size);
+              this.solve(id, type, [...value], key, `${name} ${tuplet}[${type}]:(${key}) in cells [${[...value]}]`);
+            });
+          }
         }
       });
     });
+
   }
 
   solve($id, $type, $cells, $key, $technique = '') {
-    const { unsolved } = this;
+    const { grid, unsolved } = this;
     const { cells } = (({
       row: () => {
         return {
@@ -60,13 +66,17 @@ export default class $Pointing {
     cells
       .filter(cell => !$cells.includes(cell) && unsolved.has(cell))
       .forEach(cell => {
-        this.eliminate(cell, new Set([$key]), $technique);
-    })
+        const { candidates } = grid[cell];
+        const elimination = [$key].filter(key => candidates.has(key));
+        if (elimination.length > 0) {
+          this.eliminate(cell, new Set(elimination), $technique);
+        }
+    });
   }
 
-  eliminate($id, $values, $technique = '') {
+  eliminate($cell, $values, $technique = '') {
     const { grid } = this;
-    grid[$id].eliminateCandidates($values, $technique);
+    grid[$cell].eliminateCandidates($values, $technique);
   }
 
 }
