@@ -8,18 +8,19 @@ import $BoxLineReduction from './techniques/box_line_reduction'
 import $XWing from './techniques/x_wing'
 import $YWing from './techniques/y_wing'
 import $XYZWing from './techniques/xyz_wing'
+import $WXYZWing from './techniques/wxyz_wing'
 
 export default class Sudoku {
   constructor($data = [
-    9, 0, 0, 2, 4, 0, 0, 0, 0,
-    0, 5, 0, 6, 9, 0, 2, 3, 1,
-    0, 2, 0, 0, 5, 0, 0, 9, 0,
-    0, 9, 0, 7, 0, 0, 3, 2, 0,
-    0, 0, 2, 9, 3, 5, 6, 0, 7,
-    0, 7, 0, 0, 0, 2, 9, 0, 0,
-    0, 6, 9, 0, 2, 0, 0, 7, 3,
-    5, 1, 0, 0, 7, 9, 0, 6, 2,
-    2, 0, 7, 0, 8, 6, 0, 0, 9
+    0, 0, 0, 0, 2, 4, 7, 3, 0,
+    5, 4, 0, 3, 7, 0, 2, 6, 0,
+    2, 3, 7, 0, 0, 0, 0, 0, 4,
+    7, 0, 0, 0, 3, 0, 8, 4, 0,
+    0, 0, 3, 4, 8, 1, 0, 0, 0,
+    0, 8, 4, 0, 6, 0, 0, 0, 3,
+    3, 0, 0, 0, 0, 0, 0, 5, 9,
+    0, 7, 0, 0, 9, 3, 0, 0, 2,
+    0, 0, 6, 2, 0, 0, 3, 0, 0
   ]) {
     this.grid = [];
 
@@ -39,6 +40,7 @@ export default class Sudoku {
     this.$xWing = new $XWing(this.grid, this.unsolved);
     this.$yWing = new $YWing(this.grid, this.unsolved);
     this.$xyzWing = new $XYZWing(this.grid, this.unsolved);
+    this.$wxyzWing = new $WXYZWing(this.grid, this.unsolved);
 
     this.initCandidates();
     // this.solve();
@@ -52,6 +54,7 @@ export default class Sudoku {
     this.$xWing.scan();
     this.$yWing.scan();
     this.$xyzWing.scan();
+    this.$wxyzWing.scan();
   }
 
   setGrid($data) {

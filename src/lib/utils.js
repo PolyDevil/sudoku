@@ -142,10 +142,6 @@ export const AreCellsRightTriangle = ($cells) => {
   return false;
 }
 
-export const GetIntersection = ($setA, $setB) => {
-  if ($setA && $setB) {
-    return new Set([...$setA].filter(el => $setB.has(el)));
-  } else {
-    return new Set();
-  }
+export const GetIntersection = ($array) => {
+  return $array.reduce((p, set) => new Set([...p].filter(cell => set.has(cell))), new Set([...$array[0]]));
 }

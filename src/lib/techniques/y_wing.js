@@ -1,190 +1,97 @@
-import { BASE, DIMENSION, ARRAY, BLOCK, TUPLET } from '../consts'
+import $Wing from './wing'
+import { DIMENSION, BLOCK, TUPLET, BASE } from '../consts'
 import { GetAxis, GetXAxis, GetYAxis, GetBlockId } from '../unit'
-import { AddToSetInMap, GetCombinations, AreSetsEqual, AreCellsInOneBlock, AreCellsInOneLine, AreCellsRightTriangle, GetAxisTypesOfCells, GetIntersection } from '../utils'
+import { GetAxisTypesOfCells, GetIntersection, AreCellsInOneLine, AreCellsInOneBlock, AreCellsRightTriangle } from '../utils'
 
-export default class $YWing {
+export default class $YWing extends $Wing {
   constructor(grid, unsolved) {
+    super(grid, unsolved);
     this.grid = grid;
     this.unsolved = unsolved;
+
+    this.baseSizes = [2];
+    this.wingSizes = [2];
+    this.wingsCount = 2;
 
     this.name = 'Y-Wing';
   }
 
   scan() {
+    const { baseSizes, wingSizes, wingsCount } = this;
+    super.scan(baseSizes, wingSizes, wingsCount);
+  }
+
+  getCells(inBlock, inLine, line) {
+    const inBlockId = GetBlockId(inBlock);
+    const inLineId = GetBlockId(inLine);
+
+    const { type } = GetAxisTypesOfCells(line)[0];
+    const { start } = BLOCK;
+
+    const { cells } = (({
+      row: () => {
+        const inBlockAxis = GetYAxis(inBlock);
+        const inLineAxis = GetYAxis(inLine);
+        return {
+          cells: [
+            ...TUPLET.map(tuplet => start[inBlockId] + (DIMENSION * (inLineAxis % BASE)) + tuplet),
+            ...TUPLET.map(tuplet => start[inLineId] + (DIMENSION * (inBlockAxis % BASE)) + tuplet)
+          ]
+        };
+      },
+      column: () => {
+        const inBlockAxis = GetXAxis(inBlock);
+        const inLineAxis = GetXAxis(inLine);
+        return {
+          cells: [
+            ...TUPLET.map(tuplet => start[inBlockId] + DIMENSION * tuplet + inLineAxis % BASE),
+            ...TUPLET.map(tuplet => start[inLineId] + DIMENSION * tuplet + inBlockAxis % BASE)
+          ]
+        };
+      }
+    })[type])();
+    return cells;
+  }
+
+  solve($wing) {
+    const { wingsCount } = this;
+    const cellsCount = wingsCount + 1;
+
+    const { base, wings } = $wing;
     const { grid, unsolved } = this;
-
-    const [rows, columns] = [new Map(), new Map()];
-    ARRAY.forEach(row => {
-      ARRAY.forEach(column => {
-        const id = row * DIMENSION + column;
-        if (unsolved.has(id)) {
-          const { candidates } = grid[id];
-          if (candidates.size === 2) {
-            AddToSetInMap(rows, row, id);
-            AddToSetInMap(columns, column, id);
+    const cells = [base, ...wings];
+    const union = cells.reduce((p, c) => new Set([...p, ...grid[c].candidates]), new Set());
+    if (union.size === cellsCount) {
+      const { candidates: baseCandidates } = grid[base];
+      if (wings.every(wing => GetIntersection([baseCandidates, grid[wing].candidates]).size > 0)) {
+        if (AreCellsRightTriangle(cells)) {
+          const axes = wings.map(cell => GetAxis(cell));
+          const diagonals = [axes[0][0] * DIMENSION + axes[1][1], axes[1][0] * DIMENSION + axes[0][1]];
+          const base_reflection = diagonals.filter(cell => cell !== base)[0];
+          if (unsolved.has(base_reflection)) {
+            const keys = GetIntersection(wings.map(wing => grid[wing].candidates));
+            const technique = `${this.name}`;
+            this.eliminate(base_reflection, keys, technique);
           }
-        }
-      });
-    });
-    [rows, columns].forEach(unit => {
-      unit.forEach((value, key, data) => {
-        const { size } = value;
-        if (size > 1) {
-          const pairs = GetCombinations([...value], 2);
-          pairs.forEach(pair => {
-            const pairCandidates = pair.map(id => grid[id].candidates);
-            if (!AreSetsEqual(pairCandidates[0], pairCandidates[1])) {
-              data.forEach((v, k) => {
-                if (k !== key) {
-                  const { size: s } = v;
-                  if (s > 0) {
-                    const inunits = [...v];
-                    inunits.forEach(inunit => {
-                      const inunitCandidates = grid[inunit].candidates;
-                      if (!pairCandidates.some(pairEl => AreSetsEqual(pairEl, inunitCandidates))) {
-                        const union = new Set([
-                          ...inunitCandidates,
-                          ...pairCandidates.reduce((p, c) => p.concat([...c]), [])
-                        ]);
-                        if (union.size === 3) {
-                          this.solve([...pair, inunit]);
-                        }
-                      }
-                    });
-                  }
-                }
+        } else {
+          const inBlocks = wings.filter(cell => AreCellsInOneBlock([base, cell]));
+          const inBlock = inBlocks[0];
+          const inLines = wings.filter(cell => AreCellsInOneLine([base, cell]));
+          const inLine = inLines[0];
+          const line = [base, ...inLines];
+
+          const cells = this.getCells(inBlock, inLine, line);
+
+          const keys = GetIntersection(wings.map(wing => grid[wing].candidates));
+          if (keys.size === 1) {
+            const technique = `${this.name}`;
+            cells
+              .filter(cell => cell !== base && unsolved.has(cell))
+              .forEach(cell => {
+                this.eliminate(cell, keys, technique);
               });
-            }
-          });
-        }
-      });
-    });
-  }
-
-  getLines($cells) {
-    const { length } = $cells;
-    const [rows, columns] = [new Map(), new Map()];
-
-    $cells.forEach(id => {
-      const [row, column] = GetAxis(id);
-      AddToSetInMap(rows, row, id);
-      AddToSetInMap(columns, column, id);
-    });
-
-    const lines = [];
-    if (rows.size < length) {
-      rows.forEach(e => lines.push([...e]));
-    }
-    if (columns.size < length) {
-      columns.forEach(e => lines.push([...e]));
-    }
-    return lines.sort((x, y) => y.length - x.length);
-  }
-
-  getWing($cells) {
-    let _data = false;
-    const setData = (data) => {
-      _data = data;
-    }
-    if ($cells.length === 3 && AreCellsRightTriangle($cells) && !AreCellsInOneBlock($cells)) {
-      const inBlock = GetCombinations($cells, 2).reduce((p, pair) => {
-        return AreCellsInOneBlock(pair) ? pair : p;
-      }, false);
-      if (inBlock) {
-        const _inLine = $cells.filter(cell => !inBlock.includes(cell))[0];
-        const inLine = [
-          _inLine,
-          inBlock.filter(cell => AreCellsInOneLine([cell, _inLine]))[0],
-        ];
-        const pivot = inLine.filter(cell => inBlock.includes(cell))[0];
-        setData({
-          inLine,
-          inBlock,
-          pivot,
-          pincers: $cells.filter(cell => cell !== pivot)
-        })
-      }
-    } else {
-      const lines = this.getLines($cells);
-      const inLine = lines[0];
-      for (let l = 1; l < lines.length; l++) {
-        lines[l].forEach(line => {
-          inLine.forEach(cellInLine => {
-            const inBlock = [cellInLine, line];
-            if (AreCellsInOneBlock(inBlock)) {
-              const pivot = inLine.filter(cell => inBlock.includes(cell))[0];
-              setData({
-                inLine,
-                inBlock,
-                pivot,
-                pincers: $cells.filter(cell => cell !== pivot)
-              })
-            }
-          });
-        });
-      }
-    }
-    return _data;
-  }
-
-  solve($cells) {
-    const wing = this.getWing($cells);
-    if (wing) {
-      const { name } = this;
-      const { pivot } = wing;
-      if (AreCellsRightTriangle($cells)) {
-        const corners = $cells.filter(cell => cell !== pivot);
-        const cells = corners.map(cell => GetAxis(cell));
-        const anticorners = [cells[0][0] * DIMENSION + cells[1][1], cells[1][0] * DIMENSION + cells[0][1]];
-        const anticorner = anticorners.filter(cell => cell !== pivot);
-
-        this.eliminate([corners[0], corners[1]], anticorner, `${name} triangle`);
-      } else {
-        const { inBlock, inLine, pincers } = wing;
-        const _inBlock = inBlock.filter(cell => cell !== pivot)[0];
-        const _inLine = inLine.filter(cell => cell !== pivot)[0];
-
-        const inBlockId = GetBlockId(_inBlock);
-        const inLineId = GetBlockId(_inLine);
-
-        const { type } = GetAxisTypesOfCells(inLine)[0];
-        const { start } = BLOCK;
-        const { cells } = (({
-          row: () => {
-            const inBlockAxis = GetYAxis(_inBlock);
-            const inLineAxis = GetYAxis(_inLine);
-            return {
-              cells: [
-                ...TUPLET.map(tuplet => start[inBlockId] + (DIMENSION * (inLineAxis % BASE)) + tuplet),
-                ...TUPLET.map(tuplet => start[inLineId] + (DIMENSION * (inBlockAxis % BASE)) + tuplet)
-              ]
-            };
-          },
-          column: () => {
-            const inBlockAxis = GetXAxis(_inBlock);
-            const inLineAxis = GetXAxis(_inLine);
-            return {
-              cells: [
-                ...TUPLET.map(tuplet => start[inLineId] + (DIMENSION * (inBlockAxis % BASE)) + tuplet),
-                ...TUPLET.map(tuplet => start[inBlockId] + (DIMENSION * (inLineAxis % BASE)) + tuplet)
-              ]
-            };
           }
-        })[type])();
-
-        this.eliminate(pincers, cells.filter(cell => cell !== pivot), `${name}`);
-      }
-    }
-  }
-
-  eliminate($pincers, $cells, $technique = '') {
-    const { grid } = this;
-    if ($cells.length > 0) {
-      const keys = GetIntersection(grid[$pincers[0]].candidates, grid[$pincers[1]].candidates);
-      if (keys.size === 1) {
-        $cells.forEach(cell => {
-          grid[cell].eliminateCandidates(keys, $technique);
-        });
+        }
       }
     }
   }

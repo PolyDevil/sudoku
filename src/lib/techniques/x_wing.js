@@ -1,9 +1,11 @@
+import $Wing from './wing'
 import { ARRAY, DIMENSION, WING_SIZE } from '../consts'
 import { GetXAxis, GetYAxis } from '../unit'
 import { AddToSetInMap, AreCellsRectangle } from '../utils'
 
-export default class $XWing {
+export default class $XWing extends $Wing {
   constructor(grid, unsolved) {
+    super(grid, unsolved);
     this.grid = grid;
     this.unsolved = unsolved;
 
@@ -117,11 +119,6 @@ export default class $XWing {
       .forEach(cell => {
         this.eliminate(cell, new Set([$key]), technique);
       });
-  }
-
-  eliminate($id, $values, $technique = '') {
-    const { grid } = this;
-    grid[$id].eliminateCandidates($values, $technique);
   }
 
 }
