@@ -24,26 +24,30 @@ export default class $WXYZWing extends $Wing {
   solve($wing) {
     const { grid, unsolved } = this;
     const { base, wings } = $wing;
-    const { start, mask } = BLOCK;
-    const data = [base, ...wings].map(wing => {
-      const [row, column, block] = GetIds(wing);
-      return [...new Set([
-        ...ARRAY.map(cell => row * DIMENSION + cell),
-        ...ARRAY.map(cell => cell * DIMENSION + column),
-        ...mask.map(cell => start[block] + cell)
-      ])];
-    });
 
-    const _intersection = data.map(el => new Set(el)).reduce((p, set) => new Set([...p].filter(cell => set.has(cell))), new Set([...data[0]]));
-    const intersection = new Set([..._intersection].filter(cell => cell !== base && unsolved.has(cell)));
+    const { candidates: baseCandidates } = grid[base];
+    if (wings.every(wing => GetIntersection([baseCandidates, grid[wing].candidates]).size > 0)) {
+      const { start, mask } = BLOCK;
+      const data = [base, ...wings].map(wing => {
+        const [row, column, block] = GetIds(wing);
+        return [...new Set([
+          ...ARRAY.map(cell => row * DIMENSION + cell),
+          ...ARRAY.map(cell => cell * DIMENSION + column),
+          ...mask.map(cell => start[block] + cell)
+        ])];
+      });
 
-    const keys = GetIntersection(wings.map(wing => grid[wing].candidates));
-    if (keys.size === 1) {
-      const technique = `${this.name}`;
-      intersection
-        .forEach(cell => {
-          this.eliminate(cell, keys, technique);
-        });
+      const _intersection = data.map(el => new Set(el)).reduce((p, set) => new Set([...p].filter(cell => set.has(cell))), new Set([...data[0]]));
+      const intersection = new Set([..._intersection].filter(cell => ![base, ...wings].includes(cell) && unsolved.has(cell)));
+
+      const keys = GetIntersection(wings.map(wing => grid[wing].candidates));
+      if (keys.size === 1) {
+        const technique = `${this.name} ${[base, ...wings]}`;
+        intersection
+          .forEach(cell => {
+            this.eliminate(cell, keys, technique);
+          });
+      }
     }
   }
 

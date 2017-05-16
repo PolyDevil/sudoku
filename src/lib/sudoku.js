@@ -12,15 +12,15 @@ import $WXYZWing from './techniques/wxyz_wing'
 
 export default class Sudoku {
   constructor($data = [
-    0, 0, 0, 0, 2, 4, 7, 3, 0,
-    5, 4, 0, 3, 7, 0, 2, 6, 0,
-    2, 3, 7, 0, 0, 0, 0, 0, 4,
-    7, 0, 0, 0, 3, 0, 8, 4, 0,
-    0, 0, 3, 4, 8, 1, 0, 0, 0,
-    0, 8, 4, 0, 6, 0, 0, 0, 3,
-    3, 0, 0, 0, 0, 0, 0, 5, 9,
-    0, 7, 0, 0, 9, 3, 0, 0, 2,
-    0, 0, 6, 2, 0, 0, 3, 0, 0
+    6, 9, 0, 2, 0, 0, 0, 4, 1,
+    2, 0, 4, 1, 6, 0, 5, 9, 0,
+    1, 5, 0, 8, 4, 9, 6, 2, 0,
+    0, 0, 5, 0, 0, 6, 1, 0, 0,
+    0, 6, 0, 3, 1, 4, 0, 5, 0,
+    0, 1, 0, 5, 0, 0, 9, 6, 0,
+    0, 4, 0, 6, 0, 8, 2, 1, 5,
+    0, 0, 1, 0, 0, 0, 4, 0, 6,
+    5, 2, 6, 4, 0, 1, 0, 8, 9
   ]) {
     this.grid = [];
 
@@ -43,6 +43,7 @@ export default class Sudoku {
     this.$wxyzWing = new $WXYZWing(this.grid, this.unsolved);
 
     this.initCandidates();
+    console.log('valid: ', this.isGridValid());
     // this.solve();
   }
 
@@ -73,6 +74,23 @@ export default class Sudoku {
 
   getGrid() {
     return this.grid;
+  }
+
+  isGridValid() {
+    const { grid, unsolved } = this;
+    if (unsolved.size === 0) {
+      const { start, mask } = BLOCK;
+      return ARRAY.map(unit => {
+        return [
+          new Set(ARRAY.map(row => grid[unit * DIMENSION + row].value)),
+          new Set(ARRAY.map(column => grid[column * DIMENSION + unit].value)),
+          new Set(ARRAY.map(block => grid[start[unit] + mask[block]].value))
+        ].map(type => {
+          return type.size === DIMENSION ? true : unit;
+        });
+      });
+    }
+    return false;
   }
 
   initCandidates() {
@@ -123,7 +141,7 @@ export default class Sudoku {
         blockBase + mask[unit]
       ].forEach(cell => {
         if (unsolved.has(cell)) {
-          grid[cell].eliminateCandidates([$value]);
+          grid[cell].eliminateCandidates(new Set([$value]), `Solved cell ${$id}`);
         }
       });
     });

@@ -27,16 +27,15 @@ export default class Cell {
     $candidates.forEach(candidate => {
       this.eliminateCandidate(candidate);
     });
-    const { candidates, candidates: { size } } = this;
-    if (size === 1) {
-      this.solve([...candidates][0], $technique);
-    }
   }
 
   eliminateCandidate($candidate) {
     const { candidates } = this;
     if (candidates.has($candidate)) {
       candidates.delete($candidate);
+    }
+    if (candidates.size === 1) {
+      this.solve([...candidates][0], `Naked single`);
     }
   }
 

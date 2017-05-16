@@ -104,6 +104,12 @@ class App extends Component {
     });
   }
 
+  isGridValid() {
+    const { sudoku } = this.state;
+    const isValid = sudoku.isGridValid();
+    console.log('validation...', isValid && isValid.reduce((pre, cur, ind) => ['row', 'column', 'block'].reduce((p, c, i) => cur[i] === true ? p : `${c}:${i}`, cur[0]), true));
+  }
+
   classHelper(isGiven, isSolved, hasCandidates) {
     const a = isGiven ? `sudoku__cell____isGiven` : ``;
     const b = isSolved ? `sudoku__cell____isSolved` : ``;
@@ -205,6 +211,16 @@ class App extends Component {
                   onClick={() => this.searchBoxLineReduction()}
                 >
                   Box / Line Reduction
+                </button>
+              </li>
+            </ul>
+            <ul className="sudoku__nav_list">
+              <li className="sudoku__nav_listItem">
+                <button
+                  className="sudoku__button"
+                  onClick={() => this.isGridValid()}
+                >
+                  isGridValid
                 </button>
               </li>
             </ul>
