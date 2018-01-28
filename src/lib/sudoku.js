@@ -76,7 +76,7 @@ export default class Sudoku {
     return this.grid;
   }
 
-  isGridValid() {
+/*  isGridValid() {
     const { grid, unsolved } = this;
     if (unsolved.size === 0) {
       const { start, mask } = BLOCK;
@@ -91,6 +91,97 @@ export default class Sudoku {
       });
     }
     return false;
+  }*/
+
+  isGridValid() {
+    const { grid } = this;
+    let [validRows, validColumns, validBlocks] = [new Set(), new Set(), new Set()];
+
+    ARRAY.forEach(row => {
+      const [candidates, values] = [new Set(), new Set()];
+      let [solved, unsolved] = [0, 0];
+      ARRAY.forEach(e => {
+        const cell = grid[row * DIMENSION + e];
+        if (cell.isSolved) {
+          solved++;
+          values.add(cell.value);
+        } else {
+          unsolved++;
+          cell.candidates.forEach(e => candidates.add(e));
+        }
+      });
+
+      if (
+        unsolved === candidates.size &&
+        solved === values.size &&
+        new Set([...[...candidates], ...[...values]]).size === DIMENSION
+      ) {
+        validRows.add(row);
+      }
+    });
+
+    ARRAY.forEach(column => {
+      const [candidates, values] = [new Set(), new Set()];
+      let [solved, unsolved] = [0, 0];
+      ARRAY.forEach(e => {
+        const cell = grid[e * DIMENSION + column];
+        if (cell.isSolved) {
+          solved++;
+          values.add(cell.value);
+        } else {
+          unsolved++;
+          cell.candidates.forEach(e => candidates.add(e));
+        }
+      });
+
+      if (
+        unsolved === candidates.size &&
+        solved === values.size && 
+        new Set([...[...candidates], ...[...values]]).size === DIMENSION
+      ) {
+        validColumns.add(column);
+      }
+    });
+
+    const { start, mask } = BLOCK;
+    ARRAY.forEach(block => {
+      const [candidates, values] = [new Set(), new Set()];
+      let [solved, unsolved] = [0, 0];
+      ARRAY.forEach(e => {
+        const cell = grid[start[block] + mask[e]];
+        if (cell.isSolved) {
+          solved++;
+          values.add(cell.value);
+        } else {
+          unsolved++;
+          cell.candidates.forEach(e => candidates.add(e));
+        }
+      });
+
+      if (
+        unsolved === candidates.size &&
+        solved === values.size &&
+        new Set([...[...candidates], ...[...values]]).size === DIMENSION
+      ) {
+        validBlocks.add(block);
+      }
+    });
+
+    const [r, c, b] = [
+      [...validRows.values()],
+      [...validColumns.values()],
+      [...validBlocks.values()]
+    ];
+
+    const isGridValid = r.length === DIMENSION && c.length === DIMENSION && b.length === DIMENSION;
+    if (!isGridValid) {
+      console.groupCollapsed('Grid is not valid');
+      console.log('rows: ', ARRAY.filter(e => !r.includes(e)));
+      console.log('columns: ', ARRAY.filter(e => !c.includes(e)));
+      console.log('blocks: ', ARRAY.filter(e => !b.includes(e)));
+      console.groupEnd();
+    }
+    return isGridValid;
   }
 
   initCandidates() {
@@ -120,14 +211,14 @@ export default class Sudoku {
 
   // Cell onSolve callback - to eliminate solved value from units (row | column | block)
   cellOnSolved = ($id, $value, $technique = '') => {
-    const placeholder = $technique.length > 0 ? 'as ' : '';
-    console.log(
-      `%c Solved:%c ${$id < 10 ? '0' : ''}${$id} =>%c ${$value}%c ${placeholder} ${$technique}`,
-      `color: #7ac74f; font-size: 1rem;`,
-      `color: #d5d887; font-size: 1rem;`,
-      `color: #e87461; font-size: 1rem;`,
-      `color: #4fa0c7; font-size: 1rem;`
-    );
+    // const placeholder = $technique.length > 0 ? 'as ' : '';
+    // console.log(
+    //   `%c Solved:%c ${$id < 10 ? '0' : ''}${$id} =>%c ${$value}%c ${placeholder} ${$technique}`,
+    //   `color: #7ac74f; font-size: 1rem;`,
+    //   `color: #d5d887; font-size: 1rem;`,
+    //   `color: #e87461; font-size: 1rem;`,
+    //   `color: #4fa0c7; font-size: 1rem;`
+    // );
     const { grid, solved, unsolved } = this;
     unsolved.delete($id);
     solved.add($id);

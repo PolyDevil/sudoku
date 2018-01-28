@@ -30,7 +30,6 @@ export const AreCellsInOneLine = ($cells) => {
   return cells.every(cell => cell[0] === root[0]) || cells.every(cell => cell[1] === root[1]);
 }
 
-
 export const GetAxisTypesOfCells = ($cells) => {
   const cells = $cells.map(el => GetAxis(el));
   const q = cells.reduce((p, c) => {
